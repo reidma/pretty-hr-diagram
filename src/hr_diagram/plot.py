@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import math
 import os
+from collections.abc import Sequence
 
 import matplotlib
 import matplotlib.patheffects as patheffects
@@ -59,6 +60,16 @@ def marker_sizes(teff: ArrayLike, lum: ArrayLike) -> np.ndarray:
     return np.clip(np.sqrt(1000 * radius) + 1.5, 1.5, 1000.0)
 
 
+def _auto_point_label(index: int) -> str:
+    """Default label for the index-th user point: A, B, ... Z, AA, AB, ..."""
+    label = ""
+    index += 1
+    while index:
+        index, rem = divmod(index - 1, 26)
+        label = chr(ord("A") + rem) + label
+    return label
+
+
 def plot_hr_diagram(
         temp_lim: tuple[float, float] = (2500.0, 45000.0),
         lum_lim: tuple[float, float] = (1e-5, 1e6),
@@ -75,6 +86,8 @@ def plot_hr_diagram(
         show_famous_stars: bool = False,
         show_luminosity_classes: bool = False,
         show_star_groups: bool = False,
+        points: Sequence[tuple[float, float]
+                         | tuple[float, float, str | None]] | None = None,
         dark: bool = True,
         figsize: tuple[float, float] = (10.0, 10.5),
         dpi: int = 200,
@@ -117,6 +130,11 @@ def plot_hr_diagram(
     show_star_groups
         Soft gradient clouds for notable groups of stars (main sequence,
         giants, supergiants, red dwarfs, white dwarfs).
+    points
+        User-specified points, drawn in bright red on top of every other
+        component. Each entry is ``(teff, lum)`` — labelled automatically
+        A, B, C, ... by position in the sequence — or ``(teff, lum, label)``
+        with a custom label string, or ``(teff, lum, None)`` for no label.
     dark
         White-on-black (True) or black-on-white (False).
     figsize
@@ -137,14 +155,14 @@ def plot_hr_diagram(
               show_color_strip, show_main_sequence, show_ms_annotations,
               show_radius_lines, show_sun, show_nearest, show_brightest,
               show_gaia_sample, show_famous_stars, show_luminosity_classes,
-              show_star_groups, dark, figsize, dpi, savepath, show)
+              show_star_groups, points, dark, figsize, dpi, savepath, show)
 
 
 def _draw(temp_lim, lum_lim, show_temp_labels, show_spectral_labels,
           show_color_strip, show_main_sequence, show_ms_annotations,
           show_radius_lines, show_sun, show_nearest, show_brightest,
           show_gaia_sample, show_famous_stars, show_luminosity_classes,
-          show_star_groups, dark, figsize, dpi, savepath, show) -> None:
+          show_star_groups, points, dark, figsize, dpi, savepath, show) -> None:
     bg = "#000000" if dark else "#ffffff"
     ink = "#f2f2f2" if dark else "#1a1a1a"
     faint = "#9a9a9a" if dark else "#6e6e6e"
@@ -482,6 +500,25 @@ def _draw(temp_lim, lum_lim, show_temp_labels, show_spectral_labels,
                     arrowprops=dict(arrowstyle="-", color=sun_line,
                                     alpha=0.95, lw=1.8,
                                     shrinkA=1, shrinkB=4))
+
+    # --- user-specified points ------------------------------------------------
+    # Bright red is reserved for these: no other component uses it, so the
+    # points always contrast. Drawn at zorder 11, above even the Sun (10).
+    if points:
+        point_col = "#ff2222"
+        for i, point in enumerate(points):
+            teff, lum = float(point[0]), float(point[1])
+            label = _auto_point_label(i) if len(point) < 3 else point[2]
+            # s is a marker *area* (pt^2), so a 50% larger dot needs 2.25x
+            ax.scatter([teff], [lum], s=158, c=point_col, linewidths=1.2,
+                       edgecolors=bg, zorder=11)
+            if label:
+                ax.annotate(str(label), (teff, lum), xytext=(9, 7),
+                            textcoords="offset points", ha="left",
+                            va="bottom", fontsize=28, fontweight="bold",
+                            color=point_col, zorder=11,
+                            path_effects=[patheffects.withStroke(
+                                linewidth=3.5, foreground=bg)])
 
     if savepath:
         fig.savefig(savepath, dpi=dpi, facecolor=bg)
