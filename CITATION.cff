@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software in your teaching or research, please cite it
+  as below.
+title: pretty-hr-diagram
+type: software
+authors:
+  - family-names: Reid
+    given-names: Michael
+    email: mike.reid@utoronto.ca
+    affiliation: University of Toronto
+license: MIT
+repository-code: "https://github.com/reidma/pretty-hr-diagram"
+version: 0.1.0
+date-released: "2026-08-19"
+abstract: >-
+  Teaching-oriented Hertzsprung-Russell diagram generator, drawing HR
+  diagrams from real Gaia DR3 and Hipparcos data with every component
+  individually toggleable.

@@ -3,12 +3,17 @@ name = "hr-diagram"
 version = "0.1.0"
 description = "Teaching-oriented Hertzsprung-Russell diagram generator built on Gaia DR3 and Hipparcos data"
 readme = "README.md"
-authors = [{ name = "Mike Reid" }]
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Michael Reid" }]
 requires-python = ">=3.11"
 dependencies = [
     "matplotlib>=3.8",
     "numpy>=1.26",
 ]
+
+[project.urls]
+Repository = "https://github.com/reidma/pretty-hr-diagram"
 
 [dependency-groups]
 dev = [

@@ -1,4 +1,4 @@
-# hr-diagram
+# pretty-hr-diagram
 
 Teaching-oriented Hertzsprung–Russell diagram generator. Draws HR diagrams —
 luminosity in solar units against surface temperature, spectral type and true
@@ -8,12 +8,25 @@ lecture.
 
 ## Install
 
-From this directory:
+Requires Python 3.11 or newer.
 
 ```bash
-uv sync          # into the project environment, editable
-# or
-pip install .
+pip install git+https://github.com/reidma/pretty-hr-diagram
+```
+
+or, in a uv-managed project:
+
+```bash
+uv add git+https://github.com/reidma/pretty-hr-diagram
+```
+
+To work on the code itself, clone the repository and make an editable
+install:
+
+```bash
+git clone https://github.com/reidma/pretty-hr-diagram
+cd pretty-hr-diagram
+uv sync          # or: pip install -e .
 ```
 
 ## Use
