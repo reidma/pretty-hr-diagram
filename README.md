@@ -15,6 +15,11 @@ or produce test questions.
 Written with extensive help from Claude (mainly Fable 5). For teaching purposes
 only--I don't recommend using this for research purposes.
 
+![Sample HR Diagram showing a subset of features](sample_images/hr_diagram_partial.png)
+
+![Intentionally overcomplicated HR Diagram showing all features](sample_images/hr_diagram_all_features.png)
+
+
 ## Install
 
 Requires Python 3.11 or newer.

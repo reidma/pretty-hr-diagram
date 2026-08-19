@@ -12,6 +12,7 @@ build/
 hr_diagram_data/
 hr_diagram_figures/
 *.png
+!sample_images/*.png
 
 # Notebook checkpoints
 .ipynb_checkpoints/
