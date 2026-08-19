@@ -1,3 +1,5 @@
+![Sample HR Diagram showing a subset of features](sample_images/hr_diagram_partial.png)
+
 # pretty-hr-diagram
 
 Teaching-oriented Hertzsprung–Russell diagram generator. Main features:
@@ -15,10 +17,8 @@ or produce test questions.
 Written with extensive help from Claude (mainly Fable 5). For teaching purposes
 only--I don't recommend using this for research purposes.
 
-![Sample HR Diagram showing a subset of features](sample_images/hr_diagram_partial.png)
-
 ![Intentionally overcomplicated HR Diagram showing all features](sample_images/hr_diagram_all_features.png)
-
+*An intentionally overcomplicated diagram, showing all features of the program (except the ability to add custom dots). Just about every feature you can see in this image can be toggled on or off.*
 
 ## Install
 
