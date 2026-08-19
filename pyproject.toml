@@ -1,5 +1,5 @@
 [project]
-name = "hr-diagram"
+name = "pretty-hr-diagram"
 version = "0.1.0"
 description = "Teaching-oriented Hertzsprung-Russell diagram generator built on Gaia DR3 and Hipparcos data"
 readme = "README.md"
