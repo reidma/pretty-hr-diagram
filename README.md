@@ -1,10 +1,19 @@
 # pretty-hr-diagram
 
-Teaching-oriented Hertzsprung–Russell diagram generator. Draws HR diagrams —
-luminosity in solar units against surface temperature, spectral type and true
-stellar colour — from real Gaia DR3 and Hipparcos data, with every component
-individually toggleable so the diagram can be built up step by step in a
-lecture.
+Teaching-oriented Hertzsprung–Russell diagram generator. Main features:
+
+* Many graphical elements that can be toggled (main sequence, stellar 
+lifetime labels, luminosity classes, etc.)
+* Star colours are approximately reflective of true star colors
+rather than the oversaturated ones found in most textbooks.
+* Can show populations of stars from Gaia DR3 and Hipparcos data.
+* Dark and light background options.
+* Option to label arbitrary dots so you can highlight particular features
+or produce test questions.
+
+
+Written with extensive help from Claude (mainly Fable 5). For teaching purposes
+only--I don't recommend using this for research purposes.
 
 ## Install
 
