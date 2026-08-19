@@ -1,0 +1,24 @@
+# Environment
+.venv/
+
+# Python build/runtime artifacts
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+
+# Cached data and generated figures
+hr_diagram_data/
+hr_diagram_figures/
+*.png
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Local-only files
+generate_hr_diagram_v1_pre_package_backup.ipynb
+prev_convo_digest.txt
+
+# macOS
+.DS_Store
