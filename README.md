@@ -60,9 +60,12 @@ Every layer is a keyword toggle (`show_main_sequence`, `show_radius_lines`,
 `help(plot_hr_diagram)` for the full list.
 
 Star catalogues (~1000 nearest stars and an ~84 000-star sample within
-200 pc from Gaia DR3; the ~100 brightest stars from Hipparcos) are
-downloaded on first use and cached in `hr_diagram_data/` under the current
-working directory.
+200 pc from Gaia DR3; the ~100 brightest stars from Hipparcos) are bundled
+with the package (retrieved 2026-08-06; see
+[`src/hr_diagram/data/SOURCES.md`](src/hr_diagram/data/SOURCES.md) for the
+queries and citations), so no network access is needed. To re-download
+fresh copies from the Gaia and VizieR TAP services instead, pass a cache
+directory: `plot_hr_diagram(data_dir="hr_diagram_data")`.
 
 ## Data and calibrations
 

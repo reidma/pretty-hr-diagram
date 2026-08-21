@@ -1,4 +1,4 @@
-"""Star catalogues, downloaded once and cached as CSV.
+"""Star catalogues, bundled with the package as CSV.
 
 Samples:
 
@@ -7,6 +7,13 @@ Samples:
 - the ~100 brightest stars in the night sky, from the Hipparcos catalogue
   (Perryman et al. 1997, A&A 323, L49), which covers the very bright stars
   Gaia saturates on.
+
+By default the load functions read the copies bundled in
+``hr_diagram/data/`` (retrieved 2026-08-06; see ``data/SOURCES.md`` for
+full citations), so no network access is needed. Pass a ``data_dir`` to
+re-download the catalogues from the TAP services into that directory and
+use those copies instead; a file already present there is reused rather
+than re-downloaded, so delete it (or the directory) to force a refresh.
 """
 
 from __future__ import annotations
@@ -15,13 +22,15 @@ import csv
 import os
 import urllib.parse
 import urllib.request
+from importlib import resources
 
 import numpy as np
 
 from .calibrations import MBOL_SUN, bc_g_from_teff, bc_v_from_teff, \
     teff_from_b_v, teff_from_bp_rp
 
-# Default cache directory, relative to the current working directory.
+# Conventional cache directory for re-downloaded catalogues, relative to
+# the current working directory (e.g. load_gaia_sample(data_dir=DATA_DIR)).
 DATA_DIR: str = "hr_diagram_data"
 
 GAIA_TAP = "https://gea.esac.esa.int/tap-server/tap/sync"
@@ -68,31 +77,40 @@ def fetch_catalogue_csv(tap_url: str, adql: str, cache_name: str,
                         timeout: float = 300,
                         data_dir: str | None = None,
                         ) -> dict[str, np.ndarray] | None:
-    """Run an ADQL TAP query, or reuse the cached copy.
+    """Load a catalogue, bundled by default or downloaded on request.
+
+    With ``data_dir=None`` (the default), reads the copy bundled with the
+    package — no network access. With a ``data_dir``, runs the ADQL TAP
+    query and caches the result there, reusing any file already present.
 
     Returns the rows as a dict of numpy arrays keyed by column name (empty
     fields become NaN), or None if the download failed and no cache exists.
     """
-    data_dir = DATA_DIR if data_dir is None else data_dir
-    path = os.path.join(data_dir, cache_name)
-    if not os.path.exists(path):
-        try:
-            os.makedirs(data_dir, exist_ok=True)
-            payload = urllib.parse.urlencode({
-                "REQUEST": "doQuery", "LANG": "ADQL",
-                "FORMAT": "csv", "QUERY": adql.strip(),
-            }).encode()
-            req = urllib.request.Request(tap_url, data=payload,
-                                         headers={"User-Agent": "hr-diagram"})
-            with urllib.request.urlopen(req, timeout=timeout) as resp:
-                text = resp.read().decode()
-            with open(path, "w") as f:
-                f.write(text)
-        except Exception as err:
-            print(f"Could not download {cache_name}: {err}")
-            return None
-    with open(path) as f:
-        rows = list(csv.DictReader(f))
+    if data_dir is None:
+        text = (resources.files("hr_diagram") / "data"
+                / cache_name).read_text()
+    else:
+        path = os.path.join(data_dir, cache_name)
+        if not os.path.exists(path):
+            try:
+                os.makedirs(data_dir, exist_ok=True)
+                payload = urllib.parse.urlencode({
+                    "REQUEST": "doQuery", "LANG": "ADQL",
+                    "FORMAT": "csv", "QUERY": adql.strip(),
+                }).encode()
+                req = urllib.request.Request(
+                    tap_url, data=payload,
+                    headers={"User-Agent": "pretty-hr-diagram"})
+                with urllib.request.urlopen(req, timeout=timeout) as resp:
+                    text = resp.read().decode()
+                with open(path, "w") as f:
+                    f.write(text)
+            except Exception as err:
+                print(f"Could not download {cache_name}: {err}")
+                return None
+        with open(path) as f:
+            text = f.read()
+    rows = list(csv.DictReader(text.splitlines()))
     if not rows:
         return None
     out: dict[str, np.ndarray] = {}
@@ -104,7 +122,10 @@ def fetch_catalogue_csv(tap_url: str, adql: str, cache_name: str,
 
 def load_nearest_stars(data_dir: str | None = None,
                        ) -> tuple[np.ndarray, np.ndarray] | None:
-    """(teff, lum) arrays for the ~1000 nearest stars (Gaia DR3)."""
+    """(teff, lum) arrays for the ~1000 nearest stars (Gaia DR3).
+
+    Bundled data by default; pass a ``data_dir`` to download instead.
+    """
     tab = fetch_catalogue_csv(GAIA_TAP, QUERY_NEAREST, "gaia_nearest.csv",
                               data_dir=data_dir)
     if tab is None:
@@ -118,7 +139,10 @@ def load_nearest_stars(data_dir: str | None = None,
 
 def load_brightest_stars(n_stars: int = 100, data_dir: str | None = None,
                          ) -> tuple[np.ndarray, np.ndarray] | None:
-    """(teff, lum) arrays for the ~100 brightest stars (Hipparcos)."""
+    """(teff, lum) arrays for the ~100 brightest stars (Hipparcos).
+
+    Bundled data by default; pass a ``data_dir`` to download instead.
+    """
     tab = fetch_catalogue_csv(VIZIER_TAP, QUERY_BRIGHTEST,
                               "hipparcos_brightest.csv", data_dir=data_dir)
     if tab is None:
@@ -136,7 +160,10 @@ def load_brightest_stars(n_stars: int = 100, data_dir: str | None = None,
 
 def load_gaia_sample(data_dir: str | None = None,
                      ) -> tuple[np.ndarray, np.ndarray] | None:
-    """(teff, lum) arrays for the ~84 000-star Gaia DR3 sample within 200 pc."""
+    """(teff, lum) arrays for the ~84 000-star Gaia DR3 sample within 200 pc.
+
+    Bundled data by default; pass a ``data_dir`` to download instead.
+    """
     tab = fetch_catalogue_csv(GAIA_TAP, QUERY_GAIA_SAMPLE, "gaia_sample.csv",
                               data_dir=data_dir)
     if tab is None:

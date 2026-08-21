@@ -88,6 +88,7 @@ def plot_hr_diagram(
         show_star_groups: bool = False,
         points: Sequence[tuple[float, float]
                          | tuple[float, float, str | None]] | None = None,
+        data_dir: str | None = None,
         dark: bool = True,
         figsize: tuple[float, float] = (10.0, 10.5),
         dpi: int = 200,
@@ -135,6 +136,11 @@ def plot_hr_diagram(
         component. Each entry is ``(teff, lum)`` — labelled automatically
         A, B, C, ... by position in the sequence — or ``(teff, lum, label)``
         with a custom label string, or ``(teff, lum, None)`` for no label.
+    data_dir
+        By default the star catalogues bundled with the package are used
+        (retrieved 2026-08-06; see ``hr_diagram/data/SOURCES.md``). Pass a
+        directory to instead download fresh copies from Gaia/VizieR into it
+        (files already present there are reused rather than re-downloaded).
     dark
         White-on-black (True) or black-on-white (False).
     figsize
@@ -155,14 +161,16 @@ def plot_hr_diagram(
               show_color_strip, show_main_sequence, show_ms_annotations,
               show_radius_lines, show_sun, show_nearest, show_brightest,
               show_gaia_sample, show_famous_stars, show_luminosity_classes,
-              show_star_groups, points, dark, figsize, dpi, savepath, show)
+              show_star_groups, points, data_dir, dark, figsize, dpi,
+              savepath, show)
 
 
 def _draw(temp_lim, lum_lim, show_temp_labels, show_spectral_labels,
           show_color_strip, show_main_sequence, show_ms_annotations,
           show_radius_lines, show_sun, show_nearest, show_brightest,
           show_gaia_sample, show_famous_stars, show_luminosity_classes,
-          show_star_groups, points, dark, figsize, dpi, savepath, show) -> None:
+          show_star_groups, points, data_dir, dark, figsize, dpi,
+          savepath, show) -> None:
     bg = "#000000" if dark else "#ffffff"
     ink = "#f2f2f2" if dark else "#1a1a1a"
     faint = "#9a9a9a" if dark else "#6e6e6e"
@@ -415,21 +423,21 @@ def _draw(temp_lim, lum_lim, show_temp_labels, show_spectral_labels,
 
     # --- star samples ---------------------------------------------------------
     if show_gaia_sample:
-        data = load_gaia_sample()
+        data = load_gaia_sample(data_dir=data_dir)
         if data is not None:
             teff, lum = data
             ax.scatter(teff, lum, s=marker_sizes(teff, lum),
                        c=marker_colors(teff),
                        alpha=0.35, linewidths=0, zorder=3, rasterized=True)
     if show_nearest:
-        data = load_nearest_stars()
+        data = load_nearest_stars(data_dir=data_dir)
         if data is not None:
             teff, lum = data
             ax.scatter(teff, lum, s=marker_sizes(teff, lum),
                        c=marker_colors(teff), alpha=0.9,
                        linewidths=0.4, edgecolors=bg, zorder=4)
     if show_brightest:
-        data = load_brightest_stars()
+        data = load_brightest_stars(data_dir=data_dir)
         if data is not None:
             teff, lum = data
             ax.scatter(teff, lum, s=marker_sizes(teff, lum),
