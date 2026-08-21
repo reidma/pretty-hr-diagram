@@ -22,7 +22,8 @@ import matplotlib
 import matplotlib.patheffects as patheffects
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import ListedColormap, to_rgba
+from matplotlib.patches import Rectangle
 from matplotlib.ticker import FixedLocator, NullLocator
 from numpy.typing import ArrayLike
 
@@ -88,6 +89,9 @@ def plot_hr_diagram(
         show_star_groups: bool = False,
         points: Sequence[tuple[float, float]
                          | tuple[float, float, str | None]] | None = None,
+        regions: Sequence[tuple[float, float, float, float]
+                          | tuple[float, float, float, float, str]]
+        | None = None,
         data_dir: str | None = None,
         dark: bool = True,
         figsize: tuple[float, float] = (10.0, 10.5),
@@ -136,6 +140,11 @@ def plot_hr_diagram(
         component. Each entry is ``(teff, lum)`` — labelled automatically
         A, B, C, ... by position in the sequence — or ``(teff, lum, label)``
         with a custom label string, or ``(teff, lum, None)`` for no label.
+    regions
+        User-specified rectangular regions, drawn as translucent outlined
+        magenta rectangles on top of the diagram. Each entry is
+        ``(teff_min, teff_max, lum_min, lum_max)``, optionally followed by
+        a label string, drawn inside the rectangle's top edge.
     data_dir
         By default the star catalogues bundled with the package are used
         (retrieved 2026-08-06; see ``hr_diagram/data/SOURCES.md``). Pass a
@@ -161,16 +170,16 @@ def plot_hr_diagram(
               show_color_strip, show_main_sequence, show_ms_annotations,
               show_radius_lines, show_sun, show_nearest, show_brightest,
               show_gaia_sample, show_famous_stars, show_luminosity_classes,
-              show_star_groups, points, data_dir, dark, figsize, dpi,
-              savepath, show)
+              show_star_groups, points, regions, data_dir, dark, figsize,
+              dpi, savepath, show)
 
 
 def _draw(temp_lim, lum_lim, show_temp_labels, show_spectral_labels,
           show_color_strip, show_main_sequence, show_ms_annotations,
           show_radius_lines, show_sun, show_nearest, show_brightest,
           show_gaia_sample, show_famous_stars, show_luminosity_classes,
-          show_star_groups, points, data_dir, dark, figsize, dpi,
-          savepath, show) -> None:
+          show_star_groups, points, regions, data_dir, dark, figsize,
+          dpi, savepath, show) -> None:
     bg = "#000000" if dark else "#ffffff"
     ink = "#f2f2f2" if dark else "#1a1a1a"
     faint = "#9a9a9a" if dark else "#6e6e6e"
@@ -509,6 +518,27 @@ def _draw(temp_lim, lum_lim, show_temp_labels, show_spectral_labels,
                                     alpha=0.95, lw=1.8,
                                     shrinkA=1, shrinkB=4))
 
+    # --- user-specified rectangular regions -----------------------------------
+    # Magenta is reserved for these (as bright red is for user points), so
+    # they always contrast. Drawn at zorder 10.5, above every diagram layer
+    # but below the user points.
+    if regions:
+        region_col = "#ff4fd8" if dark else "#c2189f"
+        for region in regions:
+            t_lo, t_hi, l_lo, l_hi = (float(v) for v in region[:4])
+            label = region[4] if len(region) > 4 else None
+            ax.add_patch(Rectangle(
+                (t_lo, l_lo), t_hi - t_lo, l_hi - l_lo,
+                facecolor=to_rgba(region_col, 0.15),
+                edgecolor=to_rgba(region_col, 0.95),
+                linewidth=1.6, zorder=10.5))
+            if label:
+                ax.annotate(str(label), (math.sqrt(t_lo * t_hi), l_hi),
+                            xytext=(0, -6), textcoords="offset points",
+                            ha="center", va="top", fontsize=13,
+                            color=region_col, zorder=10.5,
+                            path_effects=halo)
+
     # --- user-specified points ------------------------------------------------
     # Bright red is reserved for these: no other component uses it, so the
     # points always contrast. Drawn at zorder 11, above even the Sun (10).
@@ -569,6 +599,11 @@ def save_hr_diagram_suite(out_dir: str = "hr_diagram_figures",
         ("10_star_groups", dict(show_gaia_sample=True, show_star_groups=True)),
         ("11_famous_stars", dict(show_gaia_sample=True,
                                  show_famous_stars=True)),
+        # user-specified rectangles: one labelled, one not, to show both forms
+        ("12_user_regions", dict(show_gaia_sample=True, regions=[
+            (5500, 7500, 30.0, 3e4, "instability strip"),
+            (8000, 40000, 1e-4, 3e-2),
+        ])),
     ]
     os.makedirs(out_dir, exist_ok=True)
     paths: list[str] = []

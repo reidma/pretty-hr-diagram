@@ -11,7 +11,7 @@ authors:
     affiliation: University of Toronto
 license: MIT
 repository-code: "https://github.com/reidma/pretty-hr-diagram"
-version: 1.0.0
+version: 1.1.0
 date-released: "2026-08-21"
 abstract: >-
   Teaching-oriented Hertzsprung-Russell diagram generator, drawing HR
