@@ -52,6 +52,7 @@ plot_hr_diagram()                            # the full diagram
 plot_hr_diagram(show_famous_stars=True)      # ... with labelled famous stars
 plot_hr_diagram(show_star_groups=True)       # ... with soft region clouds
 plot_hr_diagram(dark=False)                  # black-on-white version
+plot_hr_diagram(savepath="hr.png", dpi=100)  # save a smaller image (default dpi=200)
 save_hr_diagram_suite("hr_diagram_figures")  # one PNG per feature group
 ```
 
