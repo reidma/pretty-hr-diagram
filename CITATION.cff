@@ -11,8 +11,8 @@ authors:
     affiliation: University of Toronto
 license: MIT
 repository-code: "https://github.com/reidma/pretty-hr-diagram"
-version: 0.1.0
-date-released: "2026-08-19"
+version: 1.0.0
+date-released: "2026-08-21"
 abstract: >-
   Teaching-oriented Hertzsprung-Russell diagram generator, drawing HR
   diagrams from real Gaia DR3 and Hipparcos data with every component

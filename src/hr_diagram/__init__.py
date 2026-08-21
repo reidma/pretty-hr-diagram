@@ -27,7 +27,7 @@ from .catalogs import (load_brightest_stars, load_gaia_sample,
                        load_nearest_stars)
 from .plot import marker_sizes, plot_hr_diagram, save_hr_diagram_suite
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 
 __all__ = [
     "MBOL_SUN",
